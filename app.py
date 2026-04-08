@@ -111,7 +111,7 @@ def load_data():
     for col in numeric_cols:
         df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0)
 
-    date_cols = ["On Water ETA", "Machines Order Date", "EGRD", "Ordered ETA", "Next ETA"]
+    date_cols = ["On Water ETA", "Machines Order Date", "EGRD", "Ordered ETA", "Next Order Date", "Next ETA"]
     for col in date_cols:
         df[col] = pd.to_datetime(df[col], errors="coerce")
 
@@ -303,7 +303,7 @@ with s4:
 # =========================
 display_df = filtered_df.copy()
 
-date_cols = ["On Water ETA", "Machines Order Date", "EGRD", "Ordered ETA", "Next ETA"]
+date_cols = ["On Water ETA", "Machines Order Date", "EGRD", "Ordered ETA", "Next Order Date", "Next ETA"]
 for col in date_cols:
     display_df[col] = display_df[col].dt.strftime("%d-%b-%y")
     display_df[col] = display_df[col].fillna("")
@@ -315,6 +315,48 @@ status_map = {
     "No Supply": "❌ No Supply",
 }
 display_df["Status Display"] = display_df["Status"].map(status_map)
+
+# Status priority for sorting
+status_priority = {
+    "No Supply": 1,
+    "Future Supply": 2,
+    "Incoming": 3,
+    "In Stock": 4,
+}
+
+display_df["Status Priority"] = display_df["Status"].map(status_priority)
+
+# Sort main table: risk first, then lower supply first
+display_df = display_df.sort_values(
+    by=["Status Priority", "Total Visible Supply", "UK Stock"],
+    ascending=[True, True, True]
+)
+
+# =========================
+# Top Attention Models
+# =========================
+st.markdown('<div class="section-title">Top Attention Models</div>', unsafe_allow_html=True)
+
+attention_df = display_df[display_df["Status"].isin(["No Supply", "Future Supply", "Incoming"])].copy()
+
+if attention_df.empty:
+    st.success("No attention models in the current filter.")
+else:
+    attention_columns = [
+        "Model",
+        "Product Group",
+        "UK Stock",
+        "On Water",
+        "Ordered",
+        "Next Order",
+        "Total Visible Supply",
+        "Status Display",
+    ]
+    st.dataframe(
+        attention_df[attention_columns].head(8),
+        width="stretch",
+        hide_index=True
+    )
 
 # =========================
 # Main Table
@@ -329,6 +371,7 @@ if view_mode == "Sales View":
         "On Water",
         "Ordered",
         "Next Order",
+        "Next Order Date",
         "Total Visible Supply",
         "Status Display",
     ]
@@ -349,6 +392,7 @@ else:
         "EGRD",
         "Ordered ETA",
         "Next Order",
+        "Next Order Date",
         "Next ETA",
         "Total Visible Supply",
         "Status Display",
