@@ -104,7 +104,7 @@ st.markdown("""
 # =========================
 @st.cache_data
 def load_data():
-    df = pd.read_excel("data.xlsx", sheet_name="clean_data")
+    df = pd.read_excel("data.xlsx")
     df.columns = df.columns.str.strip()
 
     numeric_cols = ["UK Stock", "On Water", "Ordered", "Next Order"]
@@ -116,6 +116,7 @@ def load_data():
         df[col] = pd.to_datetime(df[col], errors="coerce")
 
     df["Model"] = df["Model"].fillna("").astype(str).str.strip()
+    df["Material Number"] = df["Material Number"].fillna("").astype(str).str.strip()
     df["Product Group"] = df["Product Group"].fillna("").astype(str).str.strip()
 
     df = df[df["Model"] != ""]
@@ -344,6 +345,7 @@ if attention_df.empty:
 else:
     attention_columns = [
         "Model",
+        "Material Number",
         "Product Group",
         "UK Stock",
         "On Water",
@@ -366,6 +368,7 @@ st.markdown('<div class="section-title">Model Availability</div>', unsafe_allow_
 if view_mode == "Sales View":
     sales_columns = [
         "Model",
+        "Material Number",
         "Product Group",
         "UK Stock",
         "On Water",
@@ -383,6 +386,7 @@ if view_mode == "Sales View":
 else:
     full_columns = [
         "Model",
+        "Material Number",
         "Product Group",
         "UK Stock",
         "On Water",
@@ -415,6 +419,7 @@ if risk_df.empty:
 else:
     risk_columns = [
         "Model",
+        "Material Number",
         "Product Group",
         "UK Stock",
         "On Water",
