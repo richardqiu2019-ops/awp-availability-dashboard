@@ -118,6 +118,7 @@ def load_data():
     df["Model"] = df["Model"].fillna("").astype(str).str.strip()
     df["Material Number"] = df["Material Number"].fillna("").astype(str).str.strip()
     df["Product Group"] = df["Product Group"].fillna("").astype(str).str.strip()
+    df["Remark"] = df["Remark"].fillna("").astype(str).str.strip()
 
     df = df[df["Model"] != ""]
 
@@ -353,6 +354,7 @@ else:
         "Next Order",
         "Total Visible Supply",
         "Status Display",
+        "Remark",
     ]
     st.dataframe(
         attention_df[attention_columns].head(8),
@@ -377,6 +379,7 @@ if view_mode == "Sales View":
         "Next Order Date",
         "Total Visible Supply",
         "Status Display",
+        "Remark",
     ]
     st.dataframe(
         display_df[sales_columns],
@@ -400,6 +403,7 @@ else:
         "Next ETA",
         "Total Visible Supply",
         "Status Display",
+        "Remark",
     ]
     st.dataframe(
         display_df[full_columns],
@@ -427,6 +431,7 @@ else:
         "Next Order",
         "Total Visible Supply",
         "Status Display",
+        "Remark",
     ]
     st.dataframe(
         risk_df[risk_columns],
